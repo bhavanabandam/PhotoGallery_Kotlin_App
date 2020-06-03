@@ -19,6 +19,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.room.util.StringUtil
 import com.android.example.photogallery.R
 import com.android.example.photogallery.databinding.PhotoGalleryFragmentBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -44,9 +45,24 @@ class PhotoGalleryFragment : Fragment() {
     ): View? {
         val binding: PhotoGalleryFragmentBinding =
             DataBindingUtil.inflate(inflater, R.layout.photo_gallery_fragment, container, false)
-        viewModel = ViewModelProviders.of(this).get(PhotoGalleryViewModel::class.java)
+        val application = requireNotNull(this.activity).application
+        val imageDatabaseDao = ImageDataBase.getInstance(application).imageDatabaseDao
+        val viewModelFactory = PhotoGalleryViewModelFactory(imageDatabaseDao, application)
+        viewModel =
+            ViewModelProviders.of(this, viewModelFactory).get(PhotoGalleryViewModel::class.java)
         val gridLayoutManager = GridLayoutManager(activity, 2)
         binding.photoList.layoutManager = gridLayoutManager
+        val adapter = ImageListAdapter()
+        viewModel.images.observe(
+            viewLifecycleOwner, androidx.lifecycle.Observer {
+                it?.let {
+                    Toast.makeText(activity, "selected ${it.size}", Toast.LENGTH_SHORT).show()
+                    adapter.submitList(it)
+                }
+            }
+        )
+        binding.photoList.adapter = adapter
+
         binding.uploadButton.setOnClickListener {
             //show bottom sheet and select picture and update the recycler view with Live Data concept
             val dialog = BottomSheetDialog(context!!)
@@ -135,6 +151,8 @@ class PhotoGalleryFragment : Fragment() {
                 imageUri = ""
                 super.onActivityResult(requestCode, resultCode, data)
             }
+
+            viewModel.insertImageIntoDB(imageUri)
             Toast.makeText(activity, "selected $imageUri", Toast.LENGTH_SHORT).show()
         }
     }
