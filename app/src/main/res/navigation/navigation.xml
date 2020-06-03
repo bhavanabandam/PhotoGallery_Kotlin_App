@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/photoGalleryFragment"
-        android:name="com.android.example.photogallery.photogallery.PhotoGalleryFragment"
+        android:name="com.android.example.photogallery.photogalleryview.PhotoGalleryFragment"
         android:label="PhotoGalleryFragment"
         tools:layout="@layout/photo_gallery_fragment" >
         <action
