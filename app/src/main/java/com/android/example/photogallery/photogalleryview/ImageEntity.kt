@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "image_galley_table")
 data class ImageEntity(
     @PrimaryKey(autoGenerate = true)
-    val imageId: Int = 0,
+    val imageId: Int? = null,
 
     @ColumnInfo(name = "image_uri")
-    val imageUri: String
+    val imageUri: String?
 
 )

@@ -6,6 +6,8 @@ import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -19,14 +21,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.room.util.StringUtil
 import com.android.example.photogallery.R
 import com.android.example.photogallery.databinding.PhotoGalleryFragmentBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.bottom_sheet_dialog.view.*
 import java.io.ByteArrayOutputStream
-import java.util.*
 
 class PhotoGalleryFragment : Fragment() {
 
@@ -50,7 +50,7 @@ class PhotoGalleryFragment : Fragment() {
         val viewModelFactory = PhotoGalleryViewModelFactory(imageDatabaseDao, application)
         viewModel =
             ViewModelProviders.of(this, viewModelFactory).get(PhotoGalleryViewModel::class.java)
-        val gridLayoutManager = GridLayoutManager(activity, 2)
+        val gridLayoutManager = GridLayoutManager(activity, 3)
         binding.photoList.layoutManager = gridLayoutManager
         val adapter = ImageListAdapter()
         viewModel.images.observe(
@@ -141,20 +141,33 @@ class PhotoGalleryFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         //called when image was captured from camera intent
         if (resultCode == Activity.RESULT_OK) {
-            val imageUri: String
+            val imageUri: Bitmap
             if (requestCode == IMAGE_CAPTURE_CODE) {
-                val bitmap = data?.extras?.get("data") as Bitmap
-                imageUri = convertToBase64String(bitmap)
+                imageUri = data?.extras?.get("data") as Bitmap
             } else if (requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM) {
-                imageUri = data?.data!!.toString()
+                val uri = data?.data
+                imageUri = getBitMapFromUri(uri)
             } else {
-                imageUri = ""
+                imageUri =
+                    BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_background);
                 super.onActivityResult(requestCode, resultCode, data)
             }
 
-            viewModel.insertImageIntoDB(imageUri)
+
+
+            viewModel.insertImageIntoDB(convertToBase64String(imageUri))
             Toast.makeText(activity, "selected $imageUri", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun getBitMapFromUri(uri: Uri?): Bitmap {
+        val parcelFileDescriptor =
+            uri?.let { context!!.contentResolver.openFileDescriptor(it, "r") }
+        val fileDescriptor = parcelFileDescriptor!!.fileDescriptor
+        val imagebitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor)
+        parcelFileDescriptor.close();
+        return imagebitmap
+
     }
 
     private fun convertToBase64String(bitmap: Bitmap): String {

@@ -13,8 +13,7 @@ class ImageListAdapter :
 
 
     override fun onBindViewHolder(holder: ImageItemViewHolder, position: Int) {
-        val item = getItem(position)
-        //holder.imageView.setImageDrawable(getBitmapFromString(item.imageUri))
+        holder.bind(getItem(position))
 
     }
 
@@ -23,8 +22,8 @@ class ImageListAdapter :
         return ImageItemViewHolder.from(parent)
     }
 
-    class ImageItemViewHolder(itemView: PhotoListItemBinding) :
-        RecyclerView.ViewHolder(itemView.root) {
+    class ImageItemViewHolder(val binding: PhotoListItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         companion object {
             fun from(parent: ViewGroup): ImageItemViewHolder {
@@ -34,6 +33,12 @@ class ImageListAdapter :
                 return ImageItemViewHolder(binding)
             }
         }
+
+        fun bind(item: ImageEntity) {
+            binding.image = item
+            binding.executePendingBindings()
+        }
+
 
     }
 

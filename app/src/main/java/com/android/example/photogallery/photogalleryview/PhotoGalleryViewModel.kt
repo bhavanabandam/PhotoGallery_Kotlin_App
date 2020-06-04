@@ -1,10 +1,8 @@
 package com.android.example.photogallery.photogalleryview
 
 import android.app.Application
-import android.provider.SyncStateContract.Helpers.insert
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,14 +15,10 @@ class PhotoGalleryViewModel(val dataBase: ImageDatabaseDao, application: Applica
 
     private val uploadedImage = MutableLiveData<ImageEntity>()
 
-    private var id: Int = 0
     val images = dataBase.getAllImages()
 
 
     init {
-    }
-
-    fun onUploadClick() {
 
     }
 
@@ -34,7 +28,7 @@ class PhotoGalleryViewModel(val dataBase: ImageDatabaseDao, application: Applica
 
     fun insertImageIntoDB(imageUri: String) {
         uiScope.launch {
-            val imageEntitydata = ImageEntity(id++, imageUri)
+            val imageEntitydata = ImageEntity(imageUri = imageUri)
             inserToRoom(imageEntitydata)
 
 
