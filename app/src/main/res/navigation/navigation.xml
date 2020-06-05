@@ -12,7 +12,9 @@
         tools:layout="@layout/photo_gallery_fragment" >
         <action
             android:id="@+id/action_photoGalleryFragment_to_photoDetailFragment"
-            app:destination="@id/photoDetailFragment" />
+            app:destination="@id/photoDetailFragment"
+            app:popUpTo="@id/photoGalleryFragment"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/photoDetailFragment"
@@ -21,6 +23,10 @@
         tools:layout="@layout/photo_details_fragment">
         <action
             android:id="@+id/action_photoDetailFragment_to_photoGalleryFragment"
-            app:destination="@id/photoGalleryFragment" />
+            app:destination="@id/photoGalleryFragment"
+            app:popUpToInclusive="false" />
+        <argument
+            android:name="imageId"
+            app:argType="integer" />
     </fragment>
 </navigation>

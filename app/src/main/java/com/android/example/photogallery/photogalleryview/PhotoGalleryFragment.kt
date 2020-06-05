@@ -19,7 +19,9 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.android.example.photogallery.R
 import com.android.example.photogallery.databinding.PhotoGalleryFragmentBinding
@@ -28,11 +30,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.bottom_sheet_dialog.view.*
 import java.io.ByteArrayOutputStream
 
-class PhotoGalleryFragment : Fragment() {
+class PhotoGalleryFragment : Fragment(), ImageListAdapter.OnClickListener {
 
     private lateinit var viewModel: PhotoGalleryViewModel
 
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
     private val PERMISSION_CODE = 1000
     private val IMAGE_CAPTURE_CODE = 1001
@@ -50,9 +51,10 @@ class PhotoGalleryFragment : Fragment() {
         val viewModelFactory = PhotoGalleryViewModelFactory(imageDatabaseDao, application)
         viewModel =
             ViewModelProviders.of(this, viewModelFactory).get(PhotoGalleryViewModel::class.java)
+        binding.viewModel = viewModel
         val gridLayoutManager = GridLayoutManager(activity, 3)
         binding.photoList.layoutManager = gridLayoutManager
-        val adapter = ImageListAdapter()
+        val adapter = ImageListAdapter(this)
         viewModel.images.observe(
             viewLifecycleOwner, androidx.lifecycle.Observer {
                 it?.let {
@@ -101,6 +103,17 @@ class PhotoGalleryFragment : Fragment() {
             dialog.show()
 
         }
+        viewModel.navigateToSelectedImage.observe(viewLifecycleOwner, Observer {
+            if (null != it) {
+                this.findNavController().navigate(
+                    PhotoGalleryFragmentDirections.actionPhotoGalleryFragmentToPhotoDetailFragment(
+                        it.imageId!!
+                    )
+                )
+                viewModel.displayImageDetailsComplete();
+
+            }
+        })
         return binding.root
     }
 
@@ -115,6 +128,7 @@ class PhotoGalleryFragment : Fragment() {
         //camera intent
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         startActivityForResult(cameraIntent, IMAGE_CAPTURE_CODE)
+
     }
 
     override fun onRequestPermissionsResult(
@@ -175,6 +189,15 @@ class PhotoGalleryFragment : Fragment() {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
         val b = baos.toByteArray()
         return android.util.Base64.encodeToString(b, Base64.DEFAULT)
+    }
+
+    override fun onClick(imageEntity: ImageEntity) {
+        viewModel.displayImageDetails(imageEntity)
+    }
+
+    override fun ondeleteClick(imageEntity: ImageEntity) {
+
+        viewModel.deleteImageFromDb(imageEntity)
     }
 
 }

@@ -11,6 +11,9 @@ interface ImageDatabaseDao {
     @Query("SELECT * FROM image_galley_table ORDER BY imageId DESC")
     fun getAllImages(): LiveData<List<ImageEntity>>
 
+    @Query("Select * FROM image_galley_table where imageId = :imageId")
+    fun findImageByPrimaryKey(imageId: Int): ImageEntity
+
     @Delete
     fun delete(imageDB: ImageEntity)
 }

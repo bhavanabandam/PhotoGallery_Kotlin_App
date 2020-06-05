@@ -2,6 +2,7 @@ package com.android.example.photogallery.photogalleryview
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +14,9 @@ class PhotoGalleryViewModel(val dataBase: ImageDatabaseDao, application: Applica
 
     private val uiScope = CoroutineScope(Dispatchers.Main)
 
-    private val uploadedImage = MutableLiveData<ImageEntity>()
+    private val _navigateToSelectedImage = MutableLiveData<ImageEntity>()
+    val navigateToSelectedImage: LiveData<ImageEntity>
+        get() = _navigateToSelectedImage
 
     val images = dataBase.getAllImages()
 
@@ -40,4 +43,26 @@ class PhotoGalleryViewModel(val dataBase: ImageDatabaseDao, application: Applica
             dataBase.insert(imageEntitydata)
         }
     }
+
+    fun displayImageDetails(imagedetails: ImageEntity) {
+        _navigateToSelectedImage.value = imagedetails
+    }
+
+    fun displayImageDetailsComplete() {
+        _navigateToSelectedImage.value = null
+    }
+
+    fun deleteImageFromDb(imageEntity: ImageEntity) {
+        uiScope.launch {
+            deleteFromRoom(imageEntity)
+        }
+    }
+
+    private suspend fun deleteFromRoom(imageEntity: ImageEntity) {
+        withContext(Dispatchers.IO) {
+            dataBase.delete(imageEntity)
+        }
+    }
+
+
 }

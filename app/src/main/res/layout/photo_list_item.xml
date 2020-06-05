@@ -9,6 +9,8 @@
         <variable
             name="image"
             type="com.android.example.photogallery.photogalleryview.ImageEntity" />
+
+        <import type="android.view.View" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,18 +18,34 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-
-        <ImageView
-            android:id="@+id/photo_image"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            app:imageBitmap="@{image}"
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/photo_image"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:imageBitmap="@{image.imageUri}" />
+
+            <ImageView
+                android:id="@+id/delete_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_gravity="bottom|end"
+                android:adjustViewBounds="true"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_delete_black_24dp"
+                tools:src="@drawable/ic_delete_black_24dp" />
+        </FrameLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

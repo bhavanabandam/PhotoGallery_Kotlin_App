@@ -8,11 +8,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.example.photogallery.R
 import com.android.example.photogallery.databinding.PhotoListItemBinding
 
-class ImageListAdapter :
+class ImageListAdapter(private val onClickListener: OnClickListener) :
     ListAdapter<ImageEntity, ImageListAdapter.ImageItemViewHolder>(ImageEntityDiffCallBack()) {
 
 
     override fun onBindViewHolder(holder: ImageItemViewHolder, position: Int) {
+        val imageEntity = getItem(position)
+        holder.itemView.setOnClickListener {
+            onClickListener.onClick(imageEntity)
+        }
+        holder.binding.deleteIcon.setOnClickListener {
+            onClickListener.ondeleteClick(imageEntity)
+        }
         holder.bind(getItem(position))
 
     }
@@ -42,6 +49,11 @@ class ImageListAdapter :
 
     }
 
+    interface OnClickListener {
+        fun onClick(imageEntity: ImageEntity)
+        fun ondeleteClick(imageEntity: ImageEntity)
+    }
+
 
 }
 
@@ -54,6 +66,8 @@ class ImageEntityDiffCallBack : DiffUtil.ItemCallback<ImageEntity>() {
         return oldItem == newItem
     }
 }
+
+
 
 
 
