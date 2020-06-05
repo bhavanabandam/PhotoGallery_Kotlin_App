@@ -29,12 +29,10 @@ class PhotoGalleryViewModel(val dataBase: ImageDatabaseDao, application: Applica
         super.onCleared()
     }
 
-    fun insertImageIntoDB(imageUri: String) {
+    fun insertImageIntoDB(imageUri: String, imageSize: Float) {
         uiScope.launch {
-            val imageEntitydata = ImageEntity(imageUri = imageUri)
+            val imageEntitydata = ImageEntity(imageUri = imageUri,imageSize = imageSize)
             inserToRoom(imageEntitydata)
-
-
         }
     }
 

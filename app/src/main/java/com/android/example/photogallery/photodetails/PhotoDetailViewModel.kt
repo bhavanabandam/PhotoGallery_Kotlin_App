@@ -11,18 +11,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class PhotoDetailViewModel(val dataBase: ImageDatabaseDao, application: Application) :
-    AndroidViewModel(application) {
+class PhotoDetailViewModel(val dataBase: ImageDatabaseDao, application: Application) : AndroidViewModel(application) {
 
     val _selectedImageDetails = MutableLiveData<ImageEntity>()
     val selectImageDetails: LiveData<ImageEntity>
         get() = _selectedImageDetails
+    var isDeleted = MutableLiveData<Boolean>()
 
 
     private val uiScope = CoroutineScope(Dispatchers.Main)
 
     init {
-
+        isDeleted.value = false
     }
 
     fun getImageDetails(imageId: Int) {
@@ -37,6 +37,20 @@ class PhotoDetailViewModel(val dataBase: ImageDatabaseDao, application: Applicat
             imageEntity
         }
 
+    }
+
+    fun deleteImageAndNavigate(){
+        uiScope.launch {
+            deleteImageFromDb()
+            isDeleted.value = true
+        }
+    }
+
+    private suspend fun deleteImageFromDb() {
+        withContext(Dispatchers.IO){
+            dataBase.delete(_selectedImageDetails.value!!)
+
+        }
     }
 
 

@@ -16,7 +16,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -25,7 +24,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.android.example.photogallery.R
 import com.android.example.photogallery.databinding.PhotoGalleryFragmentBinding
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.bottom_sheet_dialog.view.*
 import java.io.ByteArrayOutputStream
@@ -156,6 +154,7 @@ class PhotoGalleryFragment : Fragment(), ImageListAdapter.OnClickListener {
         //called when image was captured from camera intent
         if (resultCode == Activity.RESULT_OK) {
             val imageUri: Bitmap
+            val imageName : String
             if (requestCode == IMAGE_CAPTURE_CODE) {
                 imageUri = data?.extras?.get("data") as Bitmap
             } else if (requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM) {
@@ -167,11 +166,16 @@ class PhotoGalleryFragment : Fragment(), ImageListAdapter.OnClickListener {
                 super.onActivityResult(requestCode, resultCode, data)
             }
 
-
-
-            viewModel.insertImageIntoDB(convertToBase64String(imageUri))
-            Toast.makeText(activity, "selected $imageUri", Toast.LENGTH_SHORT).show()
+            viewModel.insertImageIntoDB(convertToBase64String(imageUri),getImageSize(imageUri))
+            //Toast.makeText(activity, "selected $imageSize", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun getImageSize(imageUri: Bitmap): Float {
+        val stream = ByteArrayOutputStream()
+        imageUri.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        val imageBytes = stream.toByteArray()
+        return (imageBytes.size/1024).toFloat()
     }
 
     private fun getBitMapFromUri(uri: Uri?): Bitmap {

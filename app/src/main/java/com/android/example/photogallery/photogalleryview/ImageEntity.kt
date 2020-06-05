@@ -10,6 +10,11 @@ data class ImageEntity(
     val imageId: Int? = null,
 
     @ColumnInfo(name = "image_uri")
-    val imageUri: String?
+    val imageUri: String?,
+
+    @ColumnInfo(name = "image_size")
+    val imageSize: Float?
+
+
 
 )

@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.android.example.photogallery.R
 import com.android.example.photogallery.databinding.PhotoDetailsFragmentBinding
 import com.android.example.photogallery.getBitMapFromString
@@ -36,6 +37,14 @@ class PhotoDetailFragment : Fragment() {
         viewModel.getImageDetails(args.imageId)
         viewModel.selectImageDetails.observe(viewLifecycleOwner, Observer {
             binding.mainPhotoImage.setImageBitmap(getBitMapFromString(it.imageUri))
+            binding.imageSize.setText("Image Size:" + it.imageSize)
+        })
+        viewModel.isDeleted.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                this.findNavController()
+                    .navigate(PhotoDetailFragmentDirections.actionPhotoDetailFragmentToPhotoGalleryFragment())
+                viewModel.isDeleted.value = false
+            }
         })
         return binding.root
     }
