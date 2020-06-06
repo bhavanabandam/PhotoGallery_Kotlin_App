@@ -1,4 +1,4 @@
-package com.android.example.photogallery.photogalleryview
+package com.android.example.photogallery.database
 
 import android.content.Context
 import androidx.room.Database
@@ -15,7 +15,8 @@ abstract class ImageDataBase : RoomDatabase() {
 
         fun getInstance(context: Context): ImageDataBase {
             synchronized(this) {
-                var instance = INSTANCE
+                var instance =
+                    INSTANCE
                 if (instance == null) {
                     instance = Room.databaseBuilder(
                         context.applicationContext,

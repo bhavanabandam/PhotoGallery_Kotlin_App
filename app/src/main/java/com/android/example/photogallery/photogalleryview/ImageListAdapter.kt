@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.android.example.photogallery.R
+import com.android.example.photogallery.database.ImageEntity
 import com.android.example.photogallery.databinding.PhotoListItemBinding
 
 class ImageListAdapter(private val onClickListener: OnClickListener) :
@@ -17,10 +17,8 @@ class ImageListAdapter(private val onClickListener: OnClickListener) :
         holder.itemView.setOnClickListener {
             onClickListener.onClick(imageEntity)
         }
-        holder.binding.deleteIcon.setOnClickListener {
-            onClickListener.ondeleteClick(imageEntity)
-        }
-        holder.bind(getItem(position))
+
+        holder.bind(getItem(position), onClickListener)
 
     }
 
@@ -41,8 +39,14 @@ class ImageListAdapter(private val onClickListener: OnClickListener) :
             }
         }
 
-        fun bind(item: ImageEntity) {
+        fun bind(
+            item: ImageEntity,
+            onClickListener: OnClickListener
+        ) {
             binding.image = item
+            binding.deleteIcon.setOnClickListener {
+                onClickListener.ondeleteClick(item)
+            }
             binding.executePendingBindings()
         }
 

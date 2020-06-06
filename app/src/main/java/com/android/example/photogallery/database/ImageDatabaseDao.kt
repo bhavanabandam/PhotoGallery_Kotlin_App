@@ -1,4 +1,4 @@
-package com.android.example.photogallery.photogalleryview
+package com.android.example.photogallery.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*

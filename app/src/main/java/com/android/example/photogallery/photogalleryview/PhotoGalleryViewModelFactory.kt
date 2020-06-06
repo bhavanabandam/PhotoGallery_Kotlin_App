@@ -3,6 +3,7 @@ package com.android.example.photogallery.photogalleryview
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.android.example.photogallery.database.ImageDatabaseDao
 import com.android.example.photogallery.photodetails.PhotoDetailViewModel
 import java.lang.IllegalArgumentException
 

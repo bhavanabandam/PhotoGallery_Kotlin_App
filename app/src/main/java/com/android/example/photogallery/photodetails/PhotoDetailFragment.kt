@@ -12,8 +12,7 @@ import androidx.navigation.fragment.findNavController
 import com.android.example.photogallery.R
 import com.android.example.photogallery.databinding.PhotoDetailsFragmentBinding
 import com.android.example.photogallery.getBitMapFromString
-import com.android.example.photogallery.photogalleryview.ImageDataBase
-import com.android.example.photogallery.photogalleryview.PhotoGalleryViewModel
+import com.android.example.photogallery.database.ImageDataBase
 import com.android.example.photogallery.photogalleryview.PhotoGalleryViewModelFactory
 
 class PhotoDetailFragment : Fragment() {
@@ -35,10 +34,16 @@ class PhotoDetailFragment : Fragment() {
         binding.detailViewModel = viewModel
         val args = PhotoDetailFragmentArgs.fromBundle(arguments!!)
         viewModel.getImageDetails(args.imageId)
+
+        /**show image details in details fragment */
         viewModel.selectImageDetails.observe(viewLifecycleOwner, Observer {
             binding.mainPhotoImage.setImageBitmap(getBitMapFromString(it.imageUri))
-            binding.imageSize.setText("Image Size:" + it.imageSize)
+            binding.imageSize.setText("Image Size: ${it.imageSize}KB")
         })
+
+        /** delete button observer
+         * --navigate back to photogalleryfragment by deleting it from the list**/
+
         viewModel.isDeleted.observe(viewLifecycleOwner, Observer {
             if (it) {
                 this.findNavController()

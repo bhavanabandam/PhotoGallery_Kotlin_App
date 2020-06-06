@@ -23,7 +23,12 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.android.example.photogallery.R
+import com.android.example.photogallery.convertToBase64String
+import com.android.example.photogallery.database.ImageDataBase
+import com.android.example.photogallery.database.ImageEntity
 import com.android.example.photogallery.databinding.PhotoGalleryFragmentBinding
+import com.android.example.photogallery.getBitMapFromUri
+import com.android.example.photogallery.getImageSize
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.bottom_sheet_dialog.view.*
 import java.io.ByteArrayOutputStream
@@ -50,56 +55,24 @@ class PhotoGalleryFragment : Fragment(), ImageListAdapter.OnClickListener {
         viewModel =
             ViewModelProviders.of(this, viewModelFactory).get(PhotoGalleryViewModel::class.java)
         binding.viewModel = viewModel
+
         val gridLayoutManager = GridLayoutManager(activity, 3)
         binding.photoList.layoutManager = gridLayoutManager
+
         val adapter = ImageListAdapter(this)
         viewModel.images.observe(
             viewLifecycleOwner, androidx.lifecycle.Observer {
                 it?.let {
-                    Toast.makeText(activity, "selected ${it.size}", Toast.LENGTH_SHORT).show()
                     adapter.submitList(it)
                 }
             }
         )
         binding.photoList.adapter = adapter
 
+
         binding.uploadButton.setOnClickListener {
             //show bottom sheet and select picture and update the recycler view with Live Data concept
-            val dialog = BottomSheetDialog(context!!)
-            val bottomSheet = layoutInflater.inflate(R.layout.bottom_sheet_dialog, null)
-            dialog.setContentView(bottomSheet)
-            bottomSheet.textView2.setOnClickListener {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (activity!!.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-                        activity!!.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        //permission was not enabled
-                        val permission = arrayOf(
-                            Manifest.permission.CAMERA,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        )
-                        //show popup to request permission
-
-                        requestPermissions(permission, PERMISSION_CODE)
-                    } else {
-                        launchCamera()
-
-                    }
-                } else {
-                    launchCamera()
-                }
-                dialog.dismiss()
-
-            }
-
-            bottomSheet.textView3.setOnClickListener {
-                pickFromGallery()
-                dialog.dismiss()
-            }
-
-            dialog.show()
-
+            showBottomSheetDialog()
         }
         viewModel.navigateToSelectedImage.observe(viewLifecycleOwner, Observer {
             if (null != it) {
@@ -113,6 +86,43 @@ class PhotoGalleryFragment : Fragment(), ImageListAdapter.OnClickListener {
             }
         })
         return binding.root
+    }
+
+    private fun showBottomSheetDialog() {
+        val dialog = BottomSheetDialog(context!!)
+        val bottomSheet = layoutInflater.inflate(R.layout.bottom_sheet_dialog, null)
+        dialog.setContentView(bottomSheet)
+        bottomSheet.textView2.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (activity!!.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                    activity!!.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED
+                ) {
+                    //permission was not enabled
+                    val permission = arrayOf(
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    )
+                    //show popup to request permission
+
+                    requestPermissions(permission, PERMISSION_CODE)
+                } else {
+                    launchCamera()
+
+                }
+            } else {
+                launchCamera()
+            }
+            dialog.dismiss()
+
+        }
+
+        bottomSheet.textView3.setOnClickListener {
+            pickFromGallery()
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun pickFromGallery() {
@@ -159,40 +169,15 @@ class PhotoGalleryFragment : Fragment(), ImageListAdapter.OnClickListener {
                 imageUri = data?.extras?.get("data") as Bitmap
             } else if (requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM) {
                 val uri = data?.data
-                imageUri = getBitMapFromUri(uri)
+                imageUri = getBitMapFromUri(uri,context)
             } else {
                 imageUri =
                     BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_background);
                 super.onActivityResult(requestCode, resultCode, data)
             }
-
             viewModel.insertImageIntoDB(convertToBase64String(imageUri),getImageSize(imageUri))
-            //Toast.makeText(activity, "selected $imageSize", Toast.LENGTH_SHORT).show()
+
         }
-    }
-
-    private fun getImageSize(imageUri: Bitmap): Float {
-        val stream = ByteArrayOutputStream()
-        imageUri.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-        val imageBytes = stream.toByteArray()
-        return (imageBytes.size/1024).toFloat()
-    }
-
-    private fun getBitMapFromUri(uri: Uri?): Bitmap {
-        val parcelFileDescriptor =
-            uri?.let { context!!.contentResolver.openFileDescriptor(it, "r") }
-        val fileDescriptor = parcelFileDescriptor!!.fileDescriptor
-        val imagebitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor)
-        parcelFileDescriptor.close();
-        return imagebitmap
-
-    }
-
-    private fun convertToBase64String(bitmap: Bitmap): String {
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
-        val b = baos.toByteArray()
-        return android.util.Base64.encodeToString(b, Base64.DEFAULT)
     }
 
     override fun onClick(imageEntity: ImageEntity) {
@@ -200,7 +185,6 @@ class PhotoGalleryFragment : Fragment(), ImageListAdapter.OnClickListener {
     }
 
     override fun ondeleteClick(imageEntity: ImageEntity) {
-
         viewModel.deleteImageFromDb(imageEntity)
     }
 

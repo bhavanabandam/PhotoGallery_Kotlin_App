@@ -4,8 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.android.example.photogallery.photogalleryview.ImageDatabaseDao
-import com.android.example.photogallery.photogalleryview.ImageEntity
+import com.android.example.photogallery.database.ImageDatabaseDao
+import com.android.example.photogallery.database.ImageEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,6 +52,4 @@ class PhotoDetailViewModel(val dataBase: ImageDatabaseDao, application: Applicat
 
         }
     }
-
-
 }
