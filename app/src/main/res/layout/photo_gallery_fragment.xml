@@ -31,7 +31,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dimen_16"
+            android:background="@drawable/button_color"
             android:text="@string/upload_btn"
+            android:textColorHighlight="#772626"
+            android:textColorLink="#9C1E1E"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

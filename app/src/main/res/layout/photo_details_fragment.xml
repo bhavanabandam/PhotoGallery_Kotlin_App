@@ -18,7 +18,7 @@
         <ImageView
             android:id="@+id/main_photo_image"
             android:layout_width="0dp"
-            android:layout_height="266dp"
+            android:layout_height="wrap_content"
             android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -40,6 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dimen_16"
+            android:background="@drawable/button_color"
             android:onClick="@{()->detailViewModel.deleteImageAndNavigate()}"
             android:text="@string/delete_gallery"
             app:layout_constraintBottom_toBottomOf="parent"
